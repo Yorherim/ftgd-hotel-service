@@ -1,8 +1,9 @@
-package mongodb
+package user
 
 import (
 	"context"
 	"errors"
+	"github.com/Yorherim/ftgd-hotel-service/internal/controller/http/v1/user"
 	"github.com/Yorherim/ftgd-hotel-service/internal/domain/entity"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -58,6 +59,26 @@ func (s *MongoUserStore) GetUsers(ctx context.Context) ([]*entity.User, error) {
 	}
 
 	return users, nil
+}
+
+func (s *MongoUserStore) CreateUser(ctx context.Context, dto user.CreateUserDTO) (*entity.User, error) {
+	res, err := s.coll.InsertOne(ctx, dto)
+	if err != nil {
+		return nil, err
+	}
+
+	id, ok := res.InsertedID.(primitive.ObjectID)
+	if ok {
+		return &entity.User{
+			Password:  dto.Password,
+			LastName:  dto.LastName,
+			Email:     dto.Email,
+			FirstName: dto.FirstName,
+			ID:        id.Hex(),
+		}, nil
+	}
+
+	return nil, errors.New("error create user")
 }
 
 func ToObjectID(id string) (*primitive.ObjectID, error) {
