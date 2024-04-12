@@ -37,8 +37,10 @@ func createLogger() *zap.Logger {
 		MaxAge:     7, // days
 	})
 
+	customWarnLevel := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
+		return lvl > zapcore.InfoLevel && lvl < zapcore.ErrorLevel
+	})
 	infoLevel := zap.NewAtomicLevelAt(zap.InfoLevel)
-	warnLevel := zap.NewAtomicLevelAt(zap.WarnLevel)
 	errLevel := zap.NewAtomicLevelAt(zap.ErrorLevel)
 
 	encodeTimeSetting := zapcore.TimeEncoderOfLayout(time.DateTime)
@@ -57,9 +59,9 @@ func createLogger() *zap.Logger {
 	core := zapcore.NewTee(
 		zapcore.NewCore(consoleEncoder, stdout, infoLevel),
 		zapcore.NewCore(fileEncoder, infoFile, infoLevel),
-		zapcore.NewCore(fileEncoder, warnFile, warnLevel),
+		zapcore.NewCore(fileEncoder, warnFile, customWarnLevel),
 		zapcore.NewCore(fileEncoder, errFile, errLevel),
 	)
 
-	return zap.New(core)
+	return zap.New(core, zap.AddCaller())
 }
