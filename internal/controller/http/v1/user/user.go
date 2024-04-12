@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/Yorherim/ftgd-hotel-service/internal/controller"
 	"github.com/go-playground/validator/v10"
+	"go.uber.org/zap"
 
 	"github.com/Yorherim/ftgd-hotel-service/internal/domain/entity"
 )
@@ -17,11 +18,15 @@ type UserService interface {
 type UserHandler struct {
 	userService UserService
 	validate    *validator.Validate
+	logger      *zap.SugaredLogger
 }
 
-func NewUserHandler(userService UserService, validate *validator.Validate) controller.Handler {
+func NewUserHandler(
+	userService UserService, validate *validator.Validate, logger *zap.SugaredLogger) controller.Handler {
+
 	return &UserHandler{
 		userService: userService,
 		validate:    validate,
+		logger:      logger,
 	}
 }

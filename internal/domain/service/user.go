@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/Yorherim/ftgd-hotel-service/internal/controller/http/v1/user"
 	"github.com/Yorherim/ftgd-hotel-service/internal/domain/entity"
+	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -18,11 +19,15 @@ type UserStore interface {
 }
 
 type Service struct {
-	store UserStore
+	store  UserStore
+	logger *zap.SugaredLogger
 }
 
-func NewUserService(storage UserStore) *Service {
-	return &Service{store: storage}
+func NewUserService(storage UserStore, logger *zap.SugaredLogger) *Service {
+	return &Service{
+		store:  storage,
+		logger: logger,
+	}
 }
 
 func (s *Service) GetUserByID(ctx context.Context, Id string) (*entity.User, error) {

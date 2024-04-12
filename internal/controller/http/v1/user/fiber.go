@@ -24,8 +24,7 @@ func (h *UserHandler) HandleGetUserByID(c *fiber.Ctx) error {
 
 	user, err := h.userService.GetUserByID(c.Context(), id)
 	if err != nil {
-		err = fiber.NewError(fiber.StatusBadRequest, "invalid id")
-		return err
+		return fiber.NewError(fiber.StatusBadRequest, "invalid id")
 	}
 
 	return controller.Response(c, controller.ResponseType{
@@ -37,8 +36,7 @@ func (h *UserHandler) HandleGetUserByID(c *fiber.Ctx) error {
 func (h *UserHandler) HandleGetUsers(c *fiber.Ctx) error {
 	users, err := h.userService.GetUsers(c.Context())
 	if err != nil {
-		err = fiber.NewError(fiber.StatusInternalServerError, "error get users")
-		return err
+		return fiber.NewError(fiber.StatusInternalServerError, "error get users")
 	}
 
 	return controller.Response(c, controller.ResponseType{
@@ -51,8 +49,7 @@ func (h *UserHandler) HandleCreateUser(c *fiber.Ctx) error {
 	var dto CreateUserDTO
 
 	if err := c.BodyParser(&dto); err != nil {
-		err = fiber.NewError(fiber.StatusBadRequest, "error parse body")
-		return err
+		return fiber.NewError(fiber.StatusBadRequest, "error parse body")
 	}
 
 	if err := h.validate.Struct(dto); err != nil {
@@ -66,14 +63,12 @@ func (h *UserHandler) HandleCreateUser(c *fiber.Ctx) error {
 
 		errorMessage := strings.Join(errs, ",\n")
 
-		err = fiber.NewError(fiber.StatusBadRequest, errorMessage)
-		return err
+		return fiber.NewError(fiber.StatusBadRequest, errorMessage)
 	}
 
 	user, err := h.userService.CreateUser(c.Context(), dto)
 	if err != nil {
-		err = fiber.NewError(fiber.StatusInternalServerError, "error create user")
-		return err
+		return fiber.NewError(fiber.StatusInternalServerError, "error create user")
 	}
 
 	return controller.Response(c, controller.ResponseType{

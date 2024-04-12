@@ -8,6 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.uber.org/zap"
 )
 
 const DatabaseName = "hotel-reservation"
@@ -17,12 +18,14 @@ const UserColl = "users"
 type MongoUserStore struct {
 	client *mongo.Client
 	coll   *mongo.Collection
+	logger *zap.SugaredLogger
 }
 
-func NewMongoUserStore(client *mongo.Client) *MongoUserStore {
+func NewMongoUserStore(client *mongo.Client, logger *zap.SugaredLogger) *MongoUserStore {
 	return &MongoUserStore{
 		client: client,
 		coll:   client.Database(DatabaseName).Collection(UserColl),
+		logger: logger,
 	}
 }
 
