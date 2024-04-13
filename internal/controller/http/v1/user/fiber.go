@@ -17,6 +17,18 @@ func (h *UserHandler) Register(appGroup fiber.Router) {
 	}
 }
 
+// HandleGetUserByID
+//
+//	@Summary		get user by ID
+//	@Description	get user by ID
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		string	true	"User ID"
+//	@Success		200	{object}	getUserByID200Example
+//	@Failure		400	{object}	getUserByID400Example{data=nil}
+//	@Failure		404	{object}	getUserByID404Example{data=nil}
+//	@Router			/users/{id} [get]
 func (h *UserHandler) HandleGetUserByID(c *fiber.Ctx) error {
 	var (
 		id = c.Params("id")
@@ -24,7 +36,7 @@ func (h *UserHandler) HandleGetUserByID(c *fiber.Ctx) error {
 
 	user, err := h.userService.GetUserByID(c.Context(), id)
 	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, "invalid id")
+		return err
 	}
 
 	return controller.Response(c, controller.ResponseType{

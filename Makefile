@@ -1,5 +1,5 @@
 build:
-	@go build -o bin/api.exe
+	@go build -o bin/hotel-service.exe
 
 #run: build
 #	@./bin/api.exe

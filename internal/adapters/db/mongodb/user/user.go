@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/Yorherim/ftgd-hotel-service/internal/controller/http/v1/user"
 	"github.com/Yorherim/ftgd-hotel-service/internal/domain/entity"
+	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -34,11 +35,11 @@ func (s *MongoUserStore) GetUserByID(ctx context.Context, id string) (*entity.Us
 
 	objId, err := ToObjectID(id)
 	if err != nil {
-		return nil, errors.New("invalid id")
+		return nil, fiber.NewError(fiber.StatusBadRequest, "invalid id")
 	}
 
 	if err := s.coll.FindOne(ctx, bson.M{"_id": objId}).Decode(&user); err != nil {
-		return nil, err
+		return nil, fiber.NewError(fiber.StatusBadRequest, "user not found")
 	}
 
 	return &user, nil

@@ -1,0 +1,104 @@
+basePath: api/v1
+definitions:
+  entity.User:
+    properties:
+      email:
+        example: vasya@gmail.com
+        type: string
+      firstName:
+        example: Vasya
+        type: string
+      id:
+        example: 660c9b35208b7ec8f81791e6
+        type: string
+      lastName:
+        example: Pupkin
+        type: string
+    type: object
+  user.getUserByID200Example:
+    properties:
+      code:
+        example: 200
+        type: integer
+      data:
+        $ref: '#/definitions/entity.User'
+      error:
+        example: ""
+        type: string
+    type: object
+  user.getUserByID400Example:
+    properties:
+      code:
+        example: 400
+        type: integer
+      data: {}
+      error:
+        example: invalid id
+        type: string
+    type: object
+  user.getUserByID404Example:
+    properties:
+      code:
+        example: 404
+        type: integer
+      data: {}
+      error:
+        example: user not found
+        type: string
+    type: object
+host: localhost:5000
+info:
+  contact:
+    email: Yorherim@gmail.com
+    name: Igor
+  description: hotel service
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: hotel reservation
+  version: "1.0"
+paths:
+  /users/{id}:
+    get:
+      consumes:
+      - application/json
+      description: get user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.getUserByID200Example'
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/user.getUserByID400Example'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/user.getUserByID404Example'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: get user by ID
+      tags:
+      - users
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"
