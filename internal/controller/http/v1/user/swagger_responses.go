@@ -12,12 +12,12 @@ type getUserByID200Example struct {
 
 type getUserByID400Example struct {
 	Code  int    `json:"code" example:"400"`
-	Data  error  `json:"data"`
+	Data  string `json:"data" example:"null" extensions:"x-nullable"`
 	Error string `json:"error" example:"invalid id"`
 }
 
 type getUserByID404Example struct {
 	Code  int    `json:"code" example:"404"`
-	Data  error  `json:"data"`
+	Data  string `json:"data" example:"null" extensions:"x-nullable"`
 	Error string `json:"error" example:"user not found"`
 }

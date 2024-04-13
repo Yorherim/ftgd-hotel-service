@@ -31,7 +31,10 @@ definitions:
       code:
         example: 400
         type: integer
-      data: {}
+      data:
+        example: "null"
+        type: string
+        nullable: true
       error:
         example: invalid id
         type: string
@@ -41,7 +44,10 @@ definitions:
       code:
         example: 404
         type: integer
-      data: {}
+      data:
+        example: "null"
+        type: string
+        nullable: true
       error:
         example: user not found
         type: string

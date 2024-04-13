@@ -6,3 +6,6 @@ build:
 
 test:
 	@go test -v ./...
+
+g-docs:
+	@swag init && ./docs/fix.sh

@@ -137,7 +137,11 @@ const docTemplate = `{
                     "type": "integer",
                     "example": 400
                 },
-                "data": {},
+                "data": {
+                    "type": "string",
+                    "nullable": true,
+                    "example": "null"
+                },
                 "error": {
                     "type": "string",
                     "example": "invalid id"
@@ -151,7 +155,11 @@ const docTemplate = `{
                     "type": "integer",
                     "example": 404
                 },
-                "data": {},
+                "data": {
+                    "type": "string",
+                    "nullable": true,
+                    "example": "null"
+                },
                 "error": {
                     "type": "string",
                     "example": "user not found"
