@@ -1,4 +1,4 @@
-basePath: api/v1
+basePath: /api/v1
 definitions:
   entity.User:
     properties:
@@ -15,6 +15,27 @@ definitions:
         example: Pupkin
         type: string
     type: object
+  user.CreateUserDTO:
+    properties:
+      email:
+        example: Vasya@gmail.com
+        type: string
+      firstName:
+        example: Vasya
+        type: string
+      lastName:
+        example: Pupkin
+        type: string
+      password:
+        example: "123456"
+        minLength: 6
+        type: string
+    required:
+    - email
+    - firstName
+    - lastName
+    - password
+    type: object
   user.getUserByID200Example:
     properties:
       code:
@@ -22,9 +43,10 @@ definitions:
         type: integer
       data:
         $ref: '#/definitions/entity.User'
-      error:
-        example: ""
-        type: string
+      errors:
+        items:
+          type: string
+        type: array
     type: object
   user.getUserByID400Example:
     properties:
@@ -35,9 +57,12 @@ definitions:
         example: "null"
         type: string
         nullable: true
-      error:
-        example: invalid id
-        type: string
+      errors:
+        example:
+        - invalid id
+        items:
+          type: string
+        type: array
     type: object
   user.getUserByID404Example:
     properties:
@@ -48,9 +73,42 @@ definitions:
         example: "null"
         type: string
         nullable: true
-      error:
-        example: user not found
+      errors:
+        example:
+        - user not found
+        items:
+          type: string
+        type: array
+    type: object
+  user.getUsers200Example:
+    properties:
+      code:
+        example: 200
+        type: integer
+      data:
+        items:
+          $ref: '#/definitions/entity.User'
+        type: array
+      errors:
+        items:
+          type: string
+        type: array
+    type: object
+  user.serverError500Example:
+    properties:
+      code:
+        example: 500
+        type: integer
+      data:
+        example: "null"
         type: string
+        nullable: true
+      errors:
+        example:
+        - server error
+        items:
+          type: string
+        type: array
     type: object
 host: localhost:5000
 info:
@@ -65,6 +123,30 @@ info:
   title: hotel reservation
   version: "1.0"
 paths:
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: get all users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.getUsers200Example'
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/user.serverError500Example'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: get all users
+      tags:
+      - users
   /users/{id}:
     get:
       consumes:
@@ -102,6 +184,37 @@ paths:
                   type: object
               type: object
       summary: get user by ID
+      tags:
+      - users
+  /users/create:
+    post:
+      consumes:
+      - application/json
+      description: create user
+      parameters:
+      - description: create user fields
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/user.CreateUserDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.getUserByID200Example'
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/user.getUserByID400Example'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: create user
       tags:
       - users
 securityDefinitions:

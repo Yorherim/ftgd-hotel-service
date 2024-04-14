@@ -17,9 +17,9 @@ var FiberConfig = fiber.Config{
 
 		if err != nil {
 			return ctx.Status(code).JSON(controller.ResponseType{
-				Error: e.Message,
-				Data:  nil,
-				Code:  e.Code,
+				Errors: []any{e.Message},
+				Data:   nil,
+				Code:   e.Code,
 			})
 		}
 

@@ -1,5 +1,5 @@
 build:
-	@go build -o bin/hotel-service.exe
+	@go build -ldflags "-s -w" -o bin/hotel-service.exe
 
 #run: build
 #	@./bin/api.exe

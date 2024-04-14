@@ -3,9 +3,10 @@ package user
 import (
 	"errors"
 	"github.com/Yorherim/ftgd-hotel-service/internal/controller"
+	"github.com/Yorherim/ftgd-hotel-service/pkg/utils"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
-	"strings"
+	"unicode"
 )
 
 func (h *UserHandler) Register(appGroup fiber.Router) {
@@ -30,6 +31,8 @@ func (h *UserHandler) Register(appGroup fiber.Router) {
 //	@Failure		404	{object}	getUserByID404Example{data=nil}
 //	@Router			/users/{id} [get]
 func (h *UserHandler) HandleGetUserByID(c *fiber.Ctx) error {
+	h.logger.Info("HandleGetUserByID start")
+
 	var (
 		id = c.Params("id")
 	)
@@ -45,10 +48,22 @@ func (h *UserHandler) HandleGetUserByID(c *fiber.Ctx) error {
 	})
 }
 
+// HandleGetUsers
+//
+//	@Summary		get all users
+//	@Description	get all users
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	getUsers200Example
+//	@Failure		500	{object}	serverError500Example{data=nil}
+//	@Router			/users [get]
 func (h *UserHandler) HandleGetUsers(c *fiber.Ctx) error {
+	h.logger.Info("HandleGetUsers start")
+
 	users, err := h.userService.GetUsers(c.Context())
 	if err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, "error get users")
+		return err
 	}
 
 	return controller.Response(c, controller.ResponseType{
@@ -57,30 +72,57 @@ func (h *UserHandler) HandleGetUsers(c *fiber.Ctx) error {
 	})
 }
 
+// HandleCreateUser
+//
+//	@Summary		create user
+//	@Description	create user
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		CreateUserDTO	true	"create user fields"
+//	@Success		200		{object}	getUserByID200Example
+//	@Failure		400		{object}	getUserByID400Example{data=nil}
+//	@Router			/users/create [post]
 func (h *UserHandler) HandleCreateUser(c *fiber.Ctx) error {
+	h.logger.Info("HandleCreateUser start")
+
 	var dto CreateUserDTO
 
 	if err := c.BodyParser(&dto); err != nil {
+		h.logger.Errorf("HandleCreateUser error BodyParser: %s", err)
 		return fiber.NewError(fiber.StatusBadRequest, "error parse body")
 	}
 
+	// validate fields
 	if err := h.validate.Struct(dto); err != nil {
-		var errs []string
+		var errs []any
 		var validatorErrs validator.ValidationErrors
+
 		errors.As(err, &validatorErrs)
 
 		for _, e := range validatorErrs {
-			errs = append(errs, e.Error())
+			customErr := h.utils.ValidatorGetCustomMsg(e)
+
+			r := []rune(e.Field())
+			r[0] = unicode.ToLower(r[0])
+
+			errs = append(errs, utils.ValidateError{
+				Param:   string(r),
+				Message: customErr,
+			})
 		}
 
-		errorMessage := strings.Join(errs, ",\n")
-
-		return fiber.NewError(fiber.StatusBadRequest, errorMessage)
+		h.logger.Errorf("HandleCreateUser error validate: %s", errs)
+		return controller.Response(c, controller.ResponseType{
+			Code:   400,
+			Data:   nil,
+			Errors: errs,
+		})
 	}
 
 	user, err := h.userService.CreateUser(c.Context(), dto)
 	if err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, "error create user")
+		return err
 	}
 
 	return controller.Response(c, controller.ResponseType{
