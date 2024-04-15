@@ -22,9 +22,21 @@ type MongoUserStore struct {
 }
 
 func NewMongoUserStore(client *mongo.Client, logger *zap.SugaredLogger) *MongoUserStore {
+	coll := client.Database(DatabaseName).Collection(UserColl)
+	//_, err := coll.Indexes().CreateOne(
+	//	context.Background(),
+	//	mongo.IndexModel{
+	//		Keys:    bson.D{{Key: "email", Value: 1}},
+	//		Options: options.Index().SetUnique(true),
+	//	},
+	//)
+	//if err != nil {
+	//	panic(err)
+	//}
+
 	return &MongoUserStore{
 		client: client,
-		coll:   client.Database(DatabaseName).Collection(UserColl),
+		coll:   coll,
 		logger: logger,
 	}
 }
@@ -60,13 +72,9 @@ func (s *MongoUserStore) GetUsers(ctx context.Context) ([]*entity.User, error) {
 	}
 	defer cur.Close(ctx)
 
-	for cur.Next(ctx) {
-		var user *entity.User
-		if err := cur.Decode(&user); err != nil {
-			s.logger.Errorf("db GetUsers error Decode: %s", err)
-			return nil, fiber.NewError(fiber.StatusInternalServerError, "server error")
-		}
-		users = append(users, user)
+	if err := cur.All(ctx, &users); err != nil {
+		s.logger.Errorf("db GetUsers error All: %s", err)
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "server error")
 	}
 
 	return users, nil
@@ -74,6 +82,17 @@ func (s *MongoUserStore) GetUsers(ctx context.Context) ([]*entity.User, error) {
 
 func (s *MongoUserStore) CreateUser(ctx context.Context, dto user.CreateUserDTO) (*entity.User, error) {
 	s.logger.Info("db CreateUser start")
+
+	var foundUser entity.User
+
+	if err := s.coll.FindOne(ctx, bson.M{"email": dto.Email}).Decode(&foundUser); err != nil {
+		s.logger.Infof("db CreateUser FindOne: %s", err)
+	}
+
+	if foundUser.ID != "" {
+		s.logger.Warn("db CreateUser warn foundUser: user with this email already created")
+		return nil, fiber.NewError(fiber.StatusBadRequest, "user with this email already created")
+	}
 
 	res, err := s.coll.InsertOne(ctx, dto)
 	if err != nil {
