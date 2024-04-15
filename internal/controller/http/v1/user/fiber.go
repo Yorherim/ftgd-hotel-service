@@ -80,8 +80,9 @@ func (h *UserHandler) HandleGetUsers(c *fiber.Ctx) error {
 //	@Accept			json
 //	@Produce		json
 //	@Param			request	body		CreateUserDTO	true	"create user fields"
-//	@Success		200		{object}	getUserByID200Example
+//	@Success		201		{object}	getUserByID200Example
 //	@Failure		400		{object}	getUserByID400Example{data=nil}
+//	@Failure		500		{object}	serverError500Example{data=nil}
 //	@Router			/users/create [post]
 func (h *UserHandler) HandleCreateUser(c *fiber.Ctx) error {
 	h.logger.Info("HandleCreateUser start")
@@ -126,7 +127,7 @@ func (h *UserHandler) HandleCreateUser(c *fiber.Ctx) error {
 	}
 
 	return controller.Response(c, controller.ResponseType{
-		Code: 200,
+		Code: 201,
 		Data: user,
 	})
 }

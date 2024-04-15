@@ -27,7 +27,12 @@ func (u *Utils) ValidatorGetCustomMsg(fe validator.FieldError) string {
 		if fe.Field() == "Password" {
 			return fmt.Sprintf("%s length password should be %s", fe.Tag(), fe.Param())
 		}
-		return "this field does not meet the minimum length"
+		return "this field doesn't meet the minimum length"
+	case "max":
+		if fe.Field() == "Password" {
+			return fmt.Sprintf("%s length password should be %s", fe.Tag(), fe.Param())
+		}
+		return "this field doesn't meet the maximum length"
 	default:
 		return fe.Error()
 	}

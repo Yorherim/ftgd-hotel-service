@@ -201,8 +201,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
             $ref: '#/definitions/user.getUserByID200Example'
         "400":
@@ -210,6 +210,15 @@ paths:
           schema:
             allOf:
             - $ref: '#/definitions/user.getUserByID400Example'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/user.serverError500Example'
             - properties:
                 data:
                   type: object

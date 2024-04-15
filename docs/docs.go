@@ -89,8 +89,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
                             "$ref": "#/definitions/user.getUserByID200Example"
                         }
@@ -101,6 +101,24 @@ const docTemplate = `{
                             "allOf": [
                                 {
                                     "$ref": "#/definitions/user.getUserByID400Example"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/user.serverError500Example"
                                 },
                                 {
                                     "type": "object",
